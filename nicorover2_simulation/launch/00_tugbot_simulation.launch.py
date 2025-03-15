@@ -35,7 +35,7 @@ def generate_launch_description():
     _file_path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_simulation'),
         'launch',
-        '01_spawn_world.launch.py'
+        '01_spawn_world_depot.launch.py'
     ])
     _nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ _file_path ])

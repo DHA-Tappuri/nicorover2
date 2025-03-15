@@ -50,7 +50,7 @@ def generate_launch_description():
     _launch_path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_slam'),
         'launch',
-        '02_localization_cartographer.launch.py'
+        '02_localization_tugbot_cartographer.launch.py'
     ])
     _nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ _launch_path ])
@@ -80,7 +80,6 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([ _launch_path ])
     )
     ld.add_action(_nodes)
-
     
     return ld
 

@@ -27,7 +27,7 @@ ARGUMENTS = [
 
     DeclareLaunchArgument(
         'scan_topic', 
-        default_value = '/scan_front/scan',
+        default_value = '/scan',
         description   = 'scan topic'
     ),
 ]
@@ -49,13 +49,14 @@ def generate_launch_description():
         output     = 'screen',
         parameters = [{
             'use_sim_time': True,
+            'queue_size': 1,
         }],
         remappings = [
             ('/scan', LaunchConfiguration('scan_topic')),
         ],        
         arguments=[
             '-configuration_directory', _file_path,
-            '-configuration_basename',  'mapping_cartographer.lua',
+            '-configuration_basename',  'mapping_nicorover2_cartographer.lua',
         ],        
     )
     ld.add_action(_node)

@@ -45,9 +45,9 @@ def generate_launch_description():
             '-d', rviz_file_path
         ],
         output     = 'screen',
-        parameters = [
-            {"use_sim_time": LaunchConfiguration('use_sim_time')}
-        ],
+        #parameters = [
+        #    {"use_sim_time": LaunchConfiguration('use_sim_time')}
+        #],
     )
     ld.add_action(_node)
     

@@ -3,7 +3,7 @@
 
 import os
 from launch                            import LaunchDescription
-from launch.actions                    import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions                    import IncludeLaunchDescription, DeclareLaunchArgument, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions              import PathJoinSubstitution
 from ament_index_python.packages       import get_package_share_directory
@@ -16,19 +16,28 @@ ARGUMENTS = [
         default_value = 'true',
         choices       = ['true', 'false'],
         description   = 'Use sim time'
-    )
+    )    
 ]
 
 
 # generate launch description
 def generate_launch_description():
     ld = LaunchDescription(ARGUMENTS)
+    
+    # add resource path
+    _path = PathJoinSubstitution([
+        get_package_share_directory('nicorover2_simulation'),
+        'models'
+    ])            
+    _env = SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', _path)
+    ld.add_action(_env)
 
     # world file
     world_file_path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_simulation'),
         'worlds',
-        'depot.sdf'
+        'depot',
+        'model.sdf'
     ])    
 
     # ros_gz_sim path

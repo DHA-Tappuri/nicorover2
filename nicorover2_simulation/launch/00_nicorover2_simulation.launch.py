@@ -21,7 +21,7 @@ ARGUMENTS = [
 
     DeclareLaunchArgument(
         'name', 
-        default_value = 'tugbot',
+        default_value = 'nicorover2',
         description   = 'spawn model name'
     ),    
 ]
@@ -32,37 +32,37 @@ def generate_launch_description():
     ld = LaunchDescription(ARGUMENTS)
 
     # spawn world
-    _file_path = PathJoinSubstitution([
+    _path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_simulation'),
         'launch',
-        '01_spawn_world.launch.py'
+        '01_spawn_world_myroom.launch.py'
     ])
     _nodes = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ _file_path ])
+        PythonLaunchDescriptionSource([ _path ])
     )
     ld.add_action(_nodes)
 
     # spawn model    
-    _file_path = PathJoinSubstitution([
+    _path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_simulation'),
         'launch',
         '02_spawn_nicorover2.launch.py'
     ])
     _nodes = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ _file_path ])
+        PythonLaunchDescriptionSource([ _path ])
     )
     ld.add_action(_nodes)
 
     # bridge between ROS2 and ign Gazebo
-    _file_path = PathJoinSubstitution([
+    _path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_simulation'),
         'launch',
         '03_ign_bridge_nicorover2.launch.py'
     ])
     _nodes = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ _file_path ])
+        PythonLaunchDescriptionSource([ _path ])
     )
     ld.add_action(_nodes)
-    
+        
     return ld
 

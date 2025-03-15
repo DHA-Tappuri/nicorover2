@@ -21,15 +21,8 @@ ARGUMENTS = [
     
     DeclareLaunchArgument(
         'name', 
-        default_value = 'tugbot',
+        default_value = 'nicorover2',
         description   = 'spawn model name'
-    ),
-
-    DeclareLaunchArgument(
-        'controller', 
-        default_value = 'joystick',
-        choices       = ['joystick', 'keyboard'],
-        description   = 'control method'
     ),
 ]
 
@@ -37,40 +30,45 @@ ARGUMENTS = [
 # generate launch description
 def generate_launch_description():
     ld = LaunchDescription(ARGUMENTS)
-
-
-    # control method
-    if( LaunchConfiguration('controller') == 'joystick' ):
-        _launch_path = PathJoinSubstitution([
-            get_package_share_directory('teleop_twist_joy'),
-            'launch',
-            'teleop-launch.py'
-        ])
-        _config_path = PathJoinSubstitution([
-            get_package_share_directory('nicorover2'),
-            'config',
-            'f710.config.yaml'
-        ])
-        _nodes = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([ _launch_path ]),
-            launch_arguments={
-                'config_filepath' : _config_path,
-            }.items()
-        )
-        ld.add_action(_nodes)
-        
-    elif( LaunchConfiguration('controller') == 'keyboard' ):
-        pass
-        
-    else:
-        pass
-
-
-    # (1) + (2) + (3) : launch simulation
+    
+    # (0) controller
+    _launch_path = PathJoinSubstitution([
+        get_package_share_directory('teleop_twist_joy'),
+        'launch',
+        'teleop-launch.py'
+    ])
+    _config_path = PathJoinSubstitution([
+        get_package_share_directory('nicorover2'),
+        'config',
+        'f710.config.yaml'
+    ])    
+    _nodes = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([ _launch_path ]),
+        launch_arguments={
+            'config_filepath' : _config_path,
+        }.items()        
+    )
+    ld.add_action(_nodes)
+    
+    # (1) : simulation world
     _launch_path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_simulation'),
         'launch',
-        '00_tugbot_simulation.launch.py'
+        '01_spawn_world_myroom.launch.py'
+    ])
+    _nodes = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([ _launch_path ]),
+        launch_arguments={
+            'use_sim_time' : LaunchConfiguration('use_sim_time'),
+        }.items()
+    )
+    ld.add_action(_nodes)
+    
+    # (2) : spawn robot
+    _launch_path = PathJoinSubstitution([
+        get_package_share_directory('nicorover2_simulation'),
+        'launch',
+        '02_spawn_nicorover2.launch.py'
     ])
     _nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ _launch_path ]),
@@ -80,18 +78,30 @@ def generate_launch_description():
     )
     ld.add_action(_nodes)
 
+    # (3) : bridge simulation and ROS
+    _launch_path = PathJoinSubstitution([
+        get_package_share_directory('nicorover2_simulation'),
+        'launch',
+        '03_ign_bridge_nicorover2.launch.py'
+    ])
+    _nodes = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([ _launch_path ]),
+        launch_arguments={
+            'use_sim_time' : LaunchConfiguration('use_sim_time'),
+        }.items()
+    )
+    ld.add_action(_nodes)
 
     # (4) : launch cartographer mapping
     _launch_path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_slam'),
         'launch',
-        '01_mapping_tugbot_cartographer.launch.py'
+        '01_mapping_nicorover2_cartographer.launch.py'
     ])
     _nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ _launch_path ])
     )
     ld.add_action(_nodes)
-
 
     # (6) : launch rviz
     _launch_path = PathJoinSubstitution([
@@ -104,6 +114,5 @@ def generate_launch_description():
     )
     ld.add_action(_nodes)
 
-    
     return ld
 

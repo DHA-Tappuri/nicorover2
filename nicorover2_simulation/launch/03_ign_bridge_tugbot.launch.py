@@ -66,30 +66,18 @@ def generate_launch_description():
     )
     ld.add_action(_node)
 
-    # parameter bridge
+    # state publisher (to TF)
+    _path = PathJoinSubstitution([
+        get_package_share_directory('nicorover2_simulation'),
+        'models',
+        'tugbot',
+        'model.urdf'
+    ])    
     _node = Node(
-        package    = 'pointcloud_to_laserscan',
-        executable = 'pointcloud_to_laserscan_node',
-        name       = 'pointcloud_to_laserscan',
-        remappings = [
-            ('cloud_in', '/scan_omni/points'),
-            ('scan',     '/scan_omni/scan'  )
-        ],
-        parameters=[{
-            'target_frame'        : 'tugbot/scan_omni/scan_omni',
-            'transform_tolerance' : 0.01,
-            'min_height'          : -0.2,
-            'max_height'          : 0.2,
-            'angle_min'           : -3.1415, # -M_PI/2
-            'angle_max'           : 3.1415,  # M_PI/2
-            'angle_increment'     : 0.0087,  # M_PI/360.0
-            'scan_time'           : 0.3333,
-            'range_min'           : 0.45,
-            'range_max'           : 30.0,
-            'use_inf'             : True,
-            'inf_epsilon'         : 1.0
-        }],
-        output     = 'screen',
+        package    = 'robot_state_publisher',
+        executable = 'robot_state_publisher',
+        arguments  = [ _path ],
+        output     = 'screen'
     )
     ld.add_action(_node)
 

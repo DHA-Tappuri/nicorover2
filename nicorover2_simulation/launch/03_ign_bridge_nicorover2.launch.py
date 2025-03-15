@@ -21,7 +21,7 @@ ARGUMENTS = [
 
     DeclareLaunchArgument(
         'name', 
-        default_value = 'tugbot',
+        default_value = 'nicorover2',
         description   = 'spawn model name'
     ),
 ]
@@ -38,26 +38,16 @@ def generate_launch_description():
         name       = 'bridge_node',
         arguments  = [
             '/clock@rosgraph_msgs/msg/Clock@ignition.msgs.Clock',
-            '/model/tugbot/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist',
-            '/model/tugbot/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
-            '/model/tugbot/odometry@nav_msgs/msg/Odometry@ignition.msgs.Odometry',
-            '/world/world_demo/model/tugbot/link/imu_link/sensor/imu/imu@sensor_msgs/msg/Imu@ignition.msgs.IMU',
-            '/world/world_demo/model/tugbot/link/camera_front/sensor/color/image@sensor_msgs/msg/Image@ignition.msgs.Image',
-            '/world/world_demo/model/tugbot/link/camera_back/sensor/color/image@sensor_msgs/msg/Image@ignition.msgs.Image',
-            '/world/world_demo/model/tugbot/link/scan_front/sensor/scan_front/scan@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan',
-            '/world/world_demo/model/tugbot/link/scan_back/sensor/scan_back/scan@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan',
-            '/world/world_demo/model/tugbot/link/scan_omni/sensor/scan_omni/scan/points@sensor_msgs/msg/PointCloud2@ignition.msgs.PointCloudPacked'
+            '/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist',
+            '/model/nicorover2/tf@tf2_msgs/msg/TFMessage@ignition.msgs.Pose_V',
+            '/model/nicorover2/odometry@nav_msgs/msg/Odometry@ignition.msgs.Odometry',
+            '/world/myroom/model/nicorover2/model/delta2g/link/link/sensor/lidar/scan@sensor_msgs/msg/LaserScan@ignition.msgs.LaserScan',
         ],
         remappings = [
-            ( '/model/tugbot/cmd_vel',                                                      '/cmd_vel' ),
-            ( '/model/tugbot/tf',                                                           '/tf'      ),
-            ( '/model/tugbot/odometry',                                                     '/odom'    ),
-            ( '/world/world_demo/model/tugbot/link/imu_link/sensor/imu/imu',                '/imu'     ),            
-            ( '/world/world_demo/model/tugbot/link/camera_front/sensor/color/image',        '/camera_front/image_raw' ),
-            ( '/world/world_demo/model/tugbot/link/camera_back/sensor/color/image',         '/camera_back/image_raw'  ),
-            ( '/world/world_demo/model/tugbot/link/scan_front/sensor/scan_front/scan',      '/scan_front/scan' ),
-            ( '/world/world_demo/model/tugbot/link/scan_back/sensor/scan_back/scan',        '/scan_back/scan'  ),
-            ( '/world/world_demo/model/tugbot/link/scan_omni/sensor/scan_omni/scan/points', '/velodyne_points' ),            
+            ( '/cmd_vel',                                                                 '/cmd_vel' ),
+            ( '/model/nicorover2/tf',                                                     '/tf'      ),
+            ( '/model/nicorover2/odometry',                                               '/odom'    ),
+            ( '/world/myroom/model/nicorover2/model/delta2g/link/link/sensor/lidar/scan', '/scan'    ),
         ],
         output     = 'screen',
         parameters = [
@@ -65,6 +55,21 @@ def generate_launch_description():
         ],
     )
     ld.add_action(_node)
-    
+
+    # state
+    _path = PathJoinSubstitution([
+        get_package_share_directory('nicorover2_simulation'),
+        'models',
+        'nicorover2',
+        'model.urdf'
+    ])    
+    _node = Node(
+        package    = 'robot_state_publisher',
+        executable = 'robot_state_publisher',
+        arguments  = [ _path ],
+        output     = 'screen'
+    )
+    ld.add_action(_node)
+
     return ld
 

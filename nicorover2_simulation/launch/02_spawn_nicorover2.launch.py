@@ -3,9 +3,9 @@
 
 import os
 from launch                            import LaunchDescription
-from launch.actions                    import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions                    import IncludeLaunchDescription, DeclareLaunchArgument, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions              import PathJoinSubstitution
+from launch.substitutions              import PathJoinSubstitution, LaunchConfiguration
 from launch_ros.actions                import Node
 from ament_index_python.packages       import get_package_share_directory
 
@@ -21,49 +21,69 @@ ARGUMENTS = [
     
     DeclareLaunchArgument(
         'name', 
-        default_value = 'tugbot',
+        default_value = 'nicorover2',
         description   = 'spawn model name'
     ),
+
+    DeclareLaunchArgument(
+        'x', 
+        default_value = '0.0',
+        description   = 'initial pos X'
+    ),
+
+    DeclareLaunchArgument(
+        'y', 
+        default_value = '-1.0',
+        description   = 'initial pos Y'
+    ),
+
+    DeclareLaunchArgument(
+        'z', 
+        default_value = '0.0',
+        description   = 'initial pos Z'
+    ),
+
+    DeclareLaunchArgument(
+        'yaw', 
+        default_value = '0.0',
+        description   = 'Yaw'
+    ),    
 ]
 
 
 # generate launch description
 def generate_launch_description():
     ld = LaunchDescription(ARGUMENTS)
+    
+    # add resource path
+    _path = PathJoinSubstitution([
+        get_package_share_directory('nicorover2_simulation'),
+        'models'
+    ])            
+    _env = SetEnvironmentVariable('IGN_GAZEBO_RESOURCE_PATH', _path)
+    ld.add_action(_env)
 
+    # spawn model
     _path = PathJoinSubstitution([
         get_package_share_directory('nicorover2_simulation'),
         'models',
-        'nicorover2.sdf'
+        LaunchConfiguration('name'),
+        'model.sdf'
     ])
     _node = Node(
         package    = 'ros_gz_sim',
         executable = 'create',
         arguments  = [
             '-file', _path,
-            '-name', 'nicorover2',
-            '-x',    '2.0',
-            '-y',    '7.0',
-            '-z',    '0.0',
-            '-Y',    '0.0'
+            '-name', LaunchConfiguration('name'),
+            '-x',    LaunchConfiguration('x'),
+            '-y',    LaunchConfiguration('y'),
+            '-z',    LaunchConfiguration('z'),
+            '-Y',    LaunchConfiguration('yaw')
         ],
         output='screen',
     )
     ld.add_action(_node)
     
-    # state
-    _path = PathJoinSubstitution([
-        get_package_share_directory('nicorover2_simulation'),
-        'models',
-        'nicorover2.urdf'
-    ])    
-    _node = Node(
-        package    = 'robot_state_publisher',
-        executable = 'robot_state_publisher',
-        arguments  = [ _path ],
-        output     = 'screen'
-    )
-    ld.add_action(_node)
-
     return ld
 

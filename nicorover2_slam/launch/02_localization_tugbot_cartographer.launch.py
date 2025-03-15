@@ -21,7 +21,7 @@ ARGUMENTS = [
 
     DeclareLaunchArgument(
         'name', 
-        default_value = 'tugbot',
+        default_value = 'nicorover2',
         description   = 'spawn model name'
     ),
     
@@ -60,7 +60,7 @@ def generate_launch_description():
         ],        
         arguments=[
             '-configuration_directory', _config_path,
-            '-configuration_basename',  'localization_cartographer.lua',
+            '-configuration_basename',  'localization_tugbot_cartographer.lua',
             '-load_state_filename',     _map_path,            
         ],        
     )
